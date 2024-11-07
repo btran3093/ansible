@@ -1,0 +1,5 @@
+  - name: add ssh key for btran
+    tags: always
+    authorized_key: 
+      user: btran
+      key: " ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILUNA5Jh5uw0NfR1RfxvT+t81wa12Zr9r274qz6qCfN7"

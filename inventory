@@ -1,8 +1,10 @@
+[workstations]
+10.12.0.36
+
 [web_servers]
 10.12.0.35 apache_pkg=httpd php_pkg=php
 
 [db_servers]
 10.12.0.28 apache_pkg=httpd php_pkg=php
 
-[workstations]
-10.12.0.36
+[file_servers]
