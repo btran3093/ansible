@@ -1,0 +1,80 @@
+---
+
+- hosts: all
+  become: true
+  pre_tasks:
+
+  - name: install updates (CentOS)
+    tags: always
+    dnf:
+      update_only: yes
+      update_cache: yes
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'  
+
+  - name: install updates (Ubuntu)
+    tags: always
+    apt:
+      update_only: yes
+      update_cache: yes
+    when: ansible_distribution == 'Ubuntu'   
+
+- hosts: workstations
+  tags: workstation
+  become: true
+  tasks:
+    
+  - name: install unzip
+    package:
+      name: unzip
+      state: latest
+
+  - name: install terraform
+    unarchive:
+      src: https://releases.hashicorp.com/terraform/1.9.8/terraform_1.9.8_linux_amd64.zip
+      dest: /usr/local/bin
+      remote_src: yes
+      mode: 0755
+      owner: root
+      group: root
+
+- hosts: web_servers
+  become: true
+  tasks:
+
+  - name: install apache and php packages
+    tags: apache, apache2, php, httpd
+    package:
+      name: 
+        - "{{apache_pkg}}"
+        - "{{php_pkg}}"
+      state: latest
+      update_cache: yes
+    when: ansible_distribution == 'CentOS'
+
+  - name: start and enable apache
+    tags: apache, apache2, httpd
+    service:
+      name: "{{apache_service}}"
+      state: started
+      enabled: yes
+    when: ansible_distribution == 'CentOS' 
+
+  - name: copy default html file for site
+    tags: apache, apache2, httpd
+    copy:
+      src: default.html
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0644      
+
+- hosts: db_servers
+  become: true
+  tasks:
+
+  - name: install mariadb
+    tags: mariadb, db
+    package:
+      name: "mariadb-server"
+      state: latest
+    when: ansible_distribution == 'RedHat'
