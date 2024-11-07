@@ -1,5 +1,15 @@
-  - name: add ssh key for btran
-    tags: always
-    authorized_key: 
-      user: btran
-      key: " ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILUNA5Jh5uw0NfR1RfxvT+t81wa12Zr9r274qz6qCfN7"
+- name: add ssh key for btran
+  tags: always
+  authorized_key: 
+    user: btran
+    key: " ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILUNA5Jh5uw0NfR1RfxvT+t81wa12Zr9r274qz6qCfN7"
+
+- name: generate sshd_config file from template
+  tags: ssh
+  template:
+    src: "{{ ssh_template_files }}"
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart_sshd
