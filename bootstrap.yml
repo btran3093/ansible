@@ -1,0 +1,43 @@
+---
+
+- hosts: all
+  become: true
+  pre_tasks:
+
+  - name: install updates (CentOS)
+    tags: always
+    dnf:
+      update_only: yes
+      update_cache: yes
+    when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'  
+
+  - name: install updates (Ubuntu)
+    tags: always
+    apt:
+      upograde: dist
+      update_cache: yes
+    when: ansible_distribution == 'Ubuntu'   
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: create btran user
+    tags: always
+    user:
+      name: btran
+      groups: root
+
+  - name: add ssh key for btran
+    tags: always
+    authorized_key: 
+      user: btran
+      key: " ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILUNA5Jh5uw0NfR1RfxvT+t81wa12Zr9r274qz6qCfN7"
+
+  - name: add sudoers file for simone
+    copy:
+      src: sudoer_btran
+      dest: /etc/sudoers.d/btran
+      owner: root
+      group: root
+      mode: 0440

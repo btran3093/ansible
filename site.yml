@@ -7,37 +7,31 @@
   - name: install updates (CentOS)
     tags: always
     dnf:
-      update_only: yes
       update_cache: yes
+    changed_when: false
     when: ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat'  
 
   - name: install updates (Ubuntu)
     tags: always
     apt:
-      update_only: yes
       update_cache: yes
+    changed_when: false
     when: ansible_distribution == 'Ubuntu'   
 
 - hosts: all
   become: true
   tasks:
 
-  - name: create simone user
-    tags: always
-    user:
-      name: simone
-      groups: testgroups
-
-  - name: add ssh key for simone
+  - name: add ssh key for btran
     tags: always
     authorized_key: 
-      user: simone
+      user: btran
       key: " ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILUNA5Jh5uw0NfR1RfxvT+t81wa12Zr9r274qz6qCfN7"
 
   - name: add sudoers file for simone
     copy:
-      src: /files/sudoer_simone
-      dest: /etc/sudoers.d/simone
+      src: /sudoer_btran
+      dest: /etc/sudoers.d/btran
       owner: root
       group: root
       mode: 0440
@@ -64,6 +58,7 @@
 - hosts: web_servers
   become: true
   tasks:
+
   - name: install apache and php packages
     tags: apache, apache2, php, httpd
     package:
@@ -101,7 +96,7 @@
   - name: copy default html file for site
     tags: apache, apache2, httpd
     copy:
-      src: /files/default.html
+      src: default.html
       dest: /var/www/html/index.html
       owner: root
       group: root
