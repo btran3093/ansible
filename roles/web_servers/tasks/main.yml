@@ -5,35 +5,28 @@
       - "{{apache_pkg}}"
       - "{{php_pkg}}"
     state: latest
-    update_cache: yes
-  when: ansible_distribution == 'CentOS'
 
 - name: start and enable apache
   tags: apache, apache2, httpd
   service:
-    name: "httpd"
+    name: "{{apache_service}}"
     state: started
     enabled: yes
-  when: ansible_distribution == 'CentOS' 
 
 - name: change admin email address
   tags: apache, apache2, httpd
   lineinfile:
     path: /etc/httpd/conf/httpd.conf 
     regexp: '^ServerAdmin'
-    line: 'ServerAdmin sombody@somewhere.net'
+    line: 'ServerAdmin brad@newsite.com'
   when: ansible_distribution == 'CentOS'
-  register: httpd
-
-- name: restart httpd (CentOS)
-  tags: apache, centos, httpd
-  service:
-    name: httpd
-    state: restarted
-  when: httpd.changed
+  notify: restart_apache
 
 - name: copy default html file for site
   tags: apache, apache2, httpd
   copy:
     src: default.html
     dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: 0644
