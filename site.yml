@@ -18,6 +18,30 @@
       update_cache: yes
     when: ansible_distribution == 'Ubuntu'   
 
+- hosts: all
+  become: true
+  tasks:
+
+  - name: create simone user
+    tags: always
+    user:
+      name: simone
+      groups: testgroups
+
+  - name: add ssh key for simone
+    tags: always
+    authorized_key: 
+      user: simone
+      key: " ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILUNA5Jh5uw0NfR1RfxvT+t81wa12Zr9r274qz6qCfN7"
+
+  - name: add sudoers file for simone
+    copy:
+      src: /files/sudoer_simone
+      dest: /etc/sudoers.d/simone
+      owner: root
+      group: root
+      mode: 0440
+
 - hosts: workstations
   tags: workstation
   become: true
@@ -57,7 +81,7 @@
       state: started
       enabled: yes
     when: ansible_distribution == 'CentOS' 
-    
+
   - name: change admin email address
     tags: apache, apache2, httpd
     lineinfile:
@@ -77,7 +101,7 @@
   - name: copy default html file for site
     tags: apache, apache2, httpd
     copy:
-      src: default.html
+      src: /files/default.html
       dest: /var/www/html/index.html
       owner: root
       group: root
